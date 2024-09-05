@@ -26,27 +26,6 @@ export function Cart({ cartItems }: CartProps) {
   const [groupedCartItems, setGroupedCartItems] = useState<CartItem[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
-  // useEffect(() => {
-  //   const groupedItems = cartItems.reduce((acc, item) => {
-  //     const existingItem = acc.find((cartItem) => cartItem.id === item.id);
-  //     if (existingItem) {
-  //       existingItem.quantity += item.quantity;
-  //     } else {
-  //       acc.push({ ...item });
-  //     }
-  //     return acc;
-  //   }, [] as CartItem[]);
-
-  //   setGroupedCartItems(groupedItems);
-
-  //   // Calculate total price
-  //   const total = groupedItems.reduce(
-  //     (acc, item) => acc + item.price * item.quantity,
-  //     0
-  //   );
-  //   setTotalPrice(total);
-  // }, [cartItems]); // Recalculate when cartItems change
-
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -97,7 +76,9 @@ export function Cart({ cartItems }: CartProps) {
 
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="submit">Proceed to Checkout</Button>
+            <Button type="submit" className="mt-4">
+              Proceed to Checkout
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

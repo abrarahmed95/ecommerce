@@ -16,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useEffect, useState } from "react";
 import { useAddToCart, useCartItems } from "@/repositories/cart";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Category } from "@/repositories/categories";
+import { useCallback } from "react";
 
 export function ProductsPage() {
   const { data: categories } = useCategories();
@@ -29,25 +29,43 @@ export function ProductsPage() {
   });
 
   const searchParams = useSearchParams();
+
+  console.log(new URLSearchParams(searchParams).getAll("cat"));
   const router = useRouter();
 
   const addToCart = useAddToCart();
 
-  const onFilterChange = (filterType: string, value: any) => {
-    const params = new URLSearchParams(searchParams);
-    params.set(filterType, value);
-    router.push(`/products?${params.toString()}`, {
-      scroll: false,
-    });
-  };
+  const onFilterChange = useCallback(
+    (filterType: string, value: any) => {
+      const params = new URLSearchParams(searchParams);
+
+      if (filterType === "cat" || filterType === "rat") {
+        const currentValues = params.getAll(filterType);
+
+        if (currentValues.includes(value)) {
+          const newValues = currentValues.filter((val) => val !== value);
+          params.delete(filterType);
+          newValues.forEach((val) => params.append(filterType, val));
+        } else {
+          params.append(filterType, value);
+        }
+      } else {
+        params.set(filterType, value.toString());
+      }
+
+      router.push(`/?${params.toString()}`, {
+        scroll: false,
+      });
+    },
+    [searchParams, router]
+  );
 
   const onCategoryChange = (category: Category) => {
-    console.log(category);
-    onFilterChange("category", category.id);
+    onFilterChange("cat", category.id);
   };
 
   const onRatingChange = (rating: number) => {
-    onFilterChange("rating", rating.toString());
+    onFilterChange("rat", rating.toString());
   };
 
   const onPriceRangeChange = (range: number) => {

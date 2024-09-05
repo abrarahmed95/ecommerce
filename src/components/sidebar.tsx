@@ -27,12 +27,6 @@ export interface SidebarProps {
   maxPrice: number;
 }
 
-const formSchema = z.object({
-  categories: z.array(z.string()),
-  rating: z.number().min(0).max(5),
-  priceRange: z.number().min(0),
-});
-
 export function Sidebar({
   categories,
   onCategoryChange,
@@ -40,73 +34,56 @@ export function Sidebar({
   onPriceRangeChange,
   maxPrice = 100,
 }: SidebarProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    defaultValues: {
-      categories: [],
-      rating: undefined,
-      priceRange: undefined,
-    },
-    resolver: zodResolver(formSchema),
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Filters</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="space-y-6">
-              <div>
-                <label className="block mb-2 font-medium">Category:</label>
+        <div className="space-y-6">
+          <div>
+            <label className="block mb-2 font-medium">Category:</label>
 
-                <div className="space-y-2">
-                  {categories?.map((category) => (
-                    <div
-                      className="flex items-center space-x-2"
-                      key={category.name}
-                    >
-                      <Checkbox
-                        id="items"
-                        onChange={() => onCategoryChange(category)}
-                      />
-                      <label
-                        htmlFor="terms"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {category.name}
-                      </label>
-                    </div>
-                  ))}
+            <div className="space-y-2">
+              {categories?.map((category) => (
+                <div
+                  className="flex items-center space-x-2"
+                  key={category.name}
+                >
+                  <Checkbox
+                    id="items"
+                    onClick={() => onCategoryChange(category)}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {category.name}
+                  </label>
                 </div>
-              </div>
-
-              <div>
-                <label className="block mb-2 font-medium">Rating:</label>
-
-                <Rating onChange={onRatingChange} />
-              </div>
-              <div>
-                <label className="block mb-2 font-medium">Price Range:</label>
-                <Slider
-                  defaultValue={[50]}
-                  max={maxPrice}
-                  step={1}
-                  onChange={console.log}
-                />
-                <div className="flex justify-between mt-2">
-                  <span>$0</span>
-                  <span>${maxPrice}</span>
-                </div>
-              </div>
+              ))}
             </div>
-          </form>
-        </Form>
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">Rating:</label>
+
+            <Rating onChange={onRatingChange} />
+          </div>
+          <div>
+            <label className="block mb-2 font-medium">Price Range:</label>
+            <Slider
+              defaultValue={[50]}
+              max={maxPrice}
+              step={1}
+              onChange={console.log}
+            />
+            <div className="flex justify-between mt-2">
+              <span>$0</span>
+              <span>${maxPrice}</span>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
