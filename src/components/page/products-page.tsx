@@ -1,11 +1,8 @@
 "use client";
 
-import { ShoppingCart } from "lucide-react";
 import { HeroSection } from "../hero-section";
 import { Navbar } from "../navbar";
 import { Sidebar } from "../sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
 import { Product, SortBy, useProducts } from "@/repositories/products";
 import { ProductCard } from "../product-card";
 import { useCategories } from "@/repositories/categories/hooks";
@@ -26,13 +23,14 @@ export function ProductsPage() {
   const selectedCategoriesParam = searchParams.getAll("category").map(Number);
   const selectedRatingsParam = searchParams.getAll("rating").map(Number);
   const selectedSortByParam = searchParams.get("sortBy") as SortBy;
-
-  const { data: categories } = useCategories();
-  const { data: products } = useProducts({
+  const params = {
     categories: selectedCategoriesParam,
     ratings: selectedRatingsParam,
     sortBy: selectedSortByParam,
-  });
+  };
+
+  const { data: categories } = useCategories();
+  const { data: products } = useProducts(params);
 
   const { data: cartItems } = useCartItems({
     products: products!,
@@ -97,6 +95,7 @@ export function ProductsPage() {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/4 space-y-6">
             <Sidebar
+              selectedFilters={params}
               categories={categories!}
               onCategoryChange={onCategoryChange}
               onRatingChange={onRatingChange}
@@ -110,7 +109,10 @@ export function ProductsPage() {
               <div className="flex items-center gap-2">
                 <label className="font-medium">Sort by:</label>
                 <div>
-                  <Select onValueChange={onSortChange}>
+                  <Select
+                    onValueChange={onSortChange}
+                    defaultValue={params?.sortBy}
+                  >
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>

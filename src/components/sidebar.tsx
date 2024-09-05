@@ -18,8 +18,14 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "./ui/form";
+import { SortBy } from "@/repositories/products";
 
 export interface SidebarProps {
+  selectedFilters: {
+    categories?: number[];
+    ratings?: number[];
+    sortBy?: SortBy;
+  };
   categories: Category[];
   onCategoryChange: (category: Category) => void;
   onRatingChange: (rating: number) => void;
@@ -28,6 +34,7 @@ export interface SidebarProps {
 }
 
 export function Sidebar({
+  selectedFilters,
   categories,
   onCategoryChange,
   onRatingChange,
@@ -51,6 +58,9 @@ export function Sidebar({
                   key={category.name}
                 >
                   <Checkbox
+                    defaultChecked={selectedFilters.categories?.includes(
+                      category.id
+                    )}
                     id="items"
                     onClick={() => onCategoryChange(category)}
                   />
