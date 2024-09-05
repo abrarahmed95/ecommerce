@@ -19,7 +19,6 @@ import {
 import { useAddToCart, useCartItems } from "@/repositories/cart";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Category } from "@/repositories/categories";
-import { useCallback } from "react";
 
 export function ProductsPage() {
   const searchParams = useSearchParams();
@@ -43,31 +42,28 @@ export function ProductsPage() {
 
   const addToCart = useAddToCart();
 
-  const onFilterChange = useCallback(
-    (filterType: string, value: any) => {
-      const params = new URLSearchParams(searchParams);
+  const onFilterChange = (filterType: string, value: any) => {
+    const params = new URLSearchParams(searchParams);
 
-      if (filterType === "category" || filterType === "rating") {
-        const currentCategories = params.getAll(filterType);
+    if (filterType === "category" || filterType === "rating") {
+      const currentCategories = params.getAll(filterType);
 
-        if (currentCategories.includes(String(value))) {
-          params.delete(filterType);
-          currentCategories
-            .filter((cat) => cat !== String(value))
-            .forEach((cat) => params.append(filterType, cat));
-        } else {
-          params.append(filterType, value);
-        }
+      if (currentCategories.includes(String(value))) {
+        params.delete(filterType);
+        currentCategories
+          .filter((cat) => cat !== String(value))
+          .forEach((cat) => params.append(filterType, cat));
       } else {
-        params.set(filterType, value.toString());
+        params.append(filterType, value);
       }
+    } else {
+      params.set(filterType, value.toString());
+    }
 
-      router.push(`/?${params.toString()}`, {
-        scroll: false,
-      });
-    },
-    [searchParams, router]
-  );
+    router.replace(`/?${params.toString()}`, {
+      scroll: false,
+    });
+  };
 
   const onCategoryChange = (category: Category) => {
     onFilterChange("category", category.id);

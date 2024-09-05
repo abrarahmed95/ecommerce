@@ -9,7 +9,7 @@ export const useProducts = (filters: {
   sortBy?: SortBy;
 }) => {
   return useQuery({
-    queryKey: [PRODUCTS_QUERY_KEY],
+    queryKey: [PRODUCTS_QUERY_KEY, filters],
     queryFn: () => ProductService.getAll(filters),
   });
 };

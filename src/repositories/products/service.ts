@@ -11,25 +11,41 @@ class _ProductService {
     ratings?: number[];
     sortBy?: SortBy;
   }): Promise<Product[]> {
-    let filteredProducts = mockProducts;
+    const params = new URLSearchParams();
 
-    if (categories.length > 0) {
-      filteredProducts = filteredProducts.filter((product) =>
-        categories.includes(product.categoryId)
+    if (categories && categories.length > 0) {
+      categories.forEach((category) =>
+        params.append("category", category.toString())
       );
     }
 
-    if (ratings.length > 0) {
-      filteredProducts = filteredProducts.filter((product) =>
-        ratings.includes(Math.round(product.rating))
-      );
+    if (ratings && ratings.length > 0) {
+      ratings.forEach((rating) => params.append("rating", rating.toString()));
     }
 
     if (sortBy) {
-      filteredProducts = await this.sort(filteredProducts, sortBy);
+      params.append("sortBy", sortBy);
     }
+    const url = `/api/v1/products?${params.toString()}`;
 
-    return filteredProducts;
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      const products: Product[] = await response.json();
+
+      return products;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getById(id: number): Promise<Product | undefined> {
