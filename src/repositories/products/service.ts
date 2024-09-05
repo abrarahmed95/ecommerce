@@ -2,8 +2,34 @@ import { Product, SortBy } from "./types";
 import { mockProducts } from "./data";
 
 class _ProductService {
-  async getAll(): Promise<Product[]> {
-    return mockProducts;
+  async getAll({
+    categories = [],
+    ratings = [],
+    sortBy,
+  }: {
+    categories?: number[];
+    ratings?: number[];
+    sortBy?: SortBy;
+  }): Promise<Product[]> {
+    let filteredProducts = mockProducts;
+
+    if (categories.length > 0) {
+      filteredProducts = filteredProducts.filter((product) =>
+        categories.includes(product.categoryId)
+      );
+    }
+
+    if (ratings.length > 0) {
+      filteredProducts = filteredProducts.filter((product) =>
+        ratings.includes(Math.round(product.rating))
+      );
+    }
+
+    if (sortBy) {
+      filteredProducts = await this.sort(filteredProducts, sortBy);
+    }
+
+    return filteredProducts;
   }
 
   async getById(id: number): Promise<Product | undefined> {

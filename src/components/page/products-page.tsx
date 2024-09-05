@@ -22,15 +22,23 @@ import { Category } from "@/repositories/categories";
 import { useCallback } from "react";
 
 export function ProductsPage() {
+  const searchParams = useSearchParams();
+
+  const selectedCategoriesParam = searchParams.getAll("category").map(Number);
+  const selectedRatingsParam = searchParams.getAll("rating").map(Number);
+  const selectedSortByParam = searchParams.get("sortBy") as SortBy;
+
   const { data: categories } = useCategories();
-  const { data: products } = useProducts();
+  const { data: products } = useProducts({
+    categories: selectedCategoriesParam,
+    ratings: selectedRatingsParam,
+    sortBy: selectedSortByParam,
+  });
+
   const { data: cartItems } = useCartItems({
     products: products!,
   });
 
-  const searchParams = useSearchParams();
-
-  console.log(new URLSearchParams(searchParams).getAll("cat"));
   const router = useRouter();
 
   const addToCart = useAddToCart();
@@ -39,13 +47,14 @@ export function ProductsPage() {
     (filterType: string, value: any) => {
       const params = new URLSearchParams(searchParams);
 
-      if (filterType === "cat" || filterType === "rat") {
-        const currentValues = params.getAll(filterType);
+      if (filterType === "category" || filterType === "rating") {
+        const currentCategories = params.getAll(filterType);
 
-        if (currentValues.includes(value)) {
-          const newValues = currentValues.filter((val) => val !== value);
+        if (currentCategories.includes(String(value))) {
           params.delete(filterType);
-          newValues.forEach((val) => params.append(filterType, val));
+          currentCategories
+            .filter((cat) => cat !== String(value))
+            .forEach((cat) => params.append(filterType, cat));
         } else {
           params.append(filterType, value);
         }
@@ -61,11 +70,11 @@ export function ProductsPage() {
   );
 
   const onCategoryChange = (category: Category) => {
-    onFilterChange("cat", category.id);
+    onFilterChange("category", category.id);
   };
 
   const onRatingChange = (rating: number) => {
-    onFilterChange("rat", rating.toString());
+    onFilterChange("rating", rating.toString());
   };
 
   const onPriceRangeChange = (range: number) => {

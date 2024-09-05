@@ -7,7 +7,6 @@ export interface RatingProps {
 }
 export function Rating({ onChange }: RatingProps) {
   const handleCheckboxChange = (rating: number) => {
-    console.log(rating);
     onChange(rating);
   };
 
