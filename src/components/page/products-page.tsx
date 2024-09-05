@@ -88,7 +88,7 @@ export function ProductsPage() {
                 <label className="font-medium">Sort by:</label>
                 <div>
                   <Select onValueChange={onSortChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent>
