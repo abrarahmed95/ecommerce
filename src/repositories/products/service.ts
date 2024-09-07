@@ -1,16 +1,15 @@
-import { Product, SortBy } from "./types";
+import { FindProductsQuery, Product, SortBy } from "./types";
 import { mockProducts } from "./data";
+import { api } from "@/lib/client";
 
 class _ProductService {
   async getAll({
     categories = [],
     ratings = [],
     sortBy,
-  }: {
-    categories?: number[];
-    ratings?: number[];
-    sortBy?: SortBy;
-  }): Promise<Product[]> {
+    price,
+    query,
+  }: FindProductsQuery): Promise<Product[]> {
     const params = new URLSearchParams();
 
     if (categories && categories.length > 0) {
@@ -26,26 +25,21 @@ class _ProductService {
     if (sortBy) {
       params.append("sortBy", sortBy);
     }
-    const url = `/api/v1/products?${params.toString()}`;
 
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error();
-      }
-
-      const products: Product[] = await response.json();
-
-      return products;
-    } catch (error) {
-      throw error;
+    if (price) {
+      params.append("price", price.join(","));
     }
+
+    if (query) {
+      params.set("q", query);
+    }
+
+    console.log(params.toString());
+
+    const url = `/products?${params.toString()}`;
+
+    const response = await api.get<{ data: Product[] }>(url);
+    return response.data;
   }
 
   async getById(id: number): Promise<Product | undefined> {

@@ -13,3 +13,11 @@ export interface Product {
   rating: number;
   image: string;
 }
+
+export type FindProductsQuery = {
+  categories?: number[];
+  ratings?: number[];
+  sortBy?: SortBy;
+  price?: number[];
+  query?: string;
+};

@@ -1,10 +1,11 @@
 import { Product } from "../products";
 
-export interface CartItem {
-  id: number;
+export interface CartItem extends Product {
   quantity: number;
 }
 
-export type CartItemWithProduct = Pick<CartItem, "quantity"> & {
-  product: Product;
+export type CartType = {
+  totalItems: number;
+  price: number;
+  products: CartItem[];
 };

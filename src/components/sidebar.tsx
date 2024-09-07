@@ -1,36 +1,28 @@
-import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Input } from "./ui/input";
+"use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Slider } from "./ui/slider";
-import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Rating } from "./rating";
 import { Category } from "@/repositories/categories/type";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "./ui/form";
 import { SortBy } from "@/repositories/products";
+import { Button } from "./ui/button";
+import { X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export interface SidebarProps {
   selectedFilters: {
     categories?: number[];
     ratings?: number[];
     sortBy?: SortBy;
+    price?: number[];
   };
   categories: Category[];
   onCategoryChange: (category: Category) => void;
   onRatingChange: (rating: number) => void;
-  onPriceRangeChange: (price: number) => void;
-  maxPrice: number;
+  onPriceRangeChange: (price: number[]) => void;
+  maxPrice?: number;
 }
 
 export function Sidebar({
@@ -39,30 +31,55 @@ export function Sidebar({
   onCategoryChange,
   onRatingChange,
   onPriceRangeChange,
-  maxPrice = 100,
+  maxPrice = 1000,
 }: SidebarProps) {
+  const DEFAULT_RANGE = [50, 500];
+  const params = useSearchParams();
+  const router = useRouter();
+  const [princeRange, setPriceRange] = useState<number[]>();
+
+  useEffect(() => {
+    setPriceRange(selectedFilters?.price ?? DEFAULT_RANGE);
+  }, [selectedFilters?.price]);
+
+  const clearFilters = () => {
+    router.push("/", { scroll: false });
+  };
+
+  const onValueCommit = (range: number[]) => {
+    onPriceRangeChange(range);
+  };
+
+  const showFilter =
+    params.has("category") || params.has("rating") || params.has("price");
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Filters</CardTitle>
+        <CardTitle className="flex justify-between items-center">
+          Filters{" "}
+          {showFilter && (
+            <Button size={"sm"} variant={"outline"} onClick={clearFilters}>
+              <X size={16} />
+            </Button>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div>
             <label className="block mb-2 font-medium">Category:</label>
 
-            <div className="space-y-2">
+            <div className="space-y-2 mt-2">
               {categories?.map((category) => (
                 <div
                   className="flex items-center space-x-2"
                   key={category.name}
                 >
                   <Checkbox
-                    defaultChecked={selectedFilters.categories?.includes(
-                      category.id
-                    )}
+                    checked={selectedFilters.categories?.includes(category.id)}
                     id="items"
-                    onClick={() => onCategoryChange(category)}
+                    onCheckedChange={() => onCategoryChange(category)}
                   />
                   <label
                     htmlFor="terms"
@@ -78,15 +95,22 @@ export function Sidebar({
           <div>
             <label className="block mb-2 font-medium">Rating:</label>
 
-            <Rating onChange={onRatingChange} />
+            <div className="mt-2">
+              <Rating
+                onChange={onRatingChange}
+                selectedFilters={selectedFilters}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 font-medium">Price Range:</label>
             <Slider
-              defaultValue={[50]}
+              className="mt-10"
+              value={princeRange}
               max={maxPrice}
-              step={1}
-              onChange={console.log}
+              step={10}
+              onValueCommit={onValueCommit}
+              onValueChange={setPriceRange}
             />
             <div className="flex justify-between mt-2">
               <span>$0</span>

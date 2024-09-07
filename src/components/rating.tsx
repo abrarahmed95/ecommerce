@@ -1,11 +1,17 @@
 import { Star } from "lucide-react";
 import React from "react";
 import { Checkbox } from "./ui/checkbox";
+import { SortBy } from "@/repositories/products";
 
 export interface RatingProps {
   onChange: (rating: number) => void;
+  selectedFilters: {
+    categories?: number[];
+    ratings?: number[];
+    sortBy?: SortBy;
+  };
 }
-export function Rating({ onChange }: RatingProps) {
+export function Rating({ selectedFilters, onChange }: RatingProps) {
   const handleCheckboxChange = (rating: number) => {
     onChange(rating);
   };
@@ -18,6 +24,7 @@ export function Rating({ onChange }: RatingProps) {
           <div key={rating} className="flex items-center space-x-2">
             <Checkbox
               id={`rating-${rating}`}
+              checked={selectedFilters?.ratings?.includes(rating)}
               onClick={() => handleCheckboxChange(rating)}
             />
             <label

@@ -11,29 +11,22 @@ import {
 } from "@/components/ui/sheet";
 import { ShoppingCart } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { Product } from "@/repositories/products";
-import React, { useEffect, useState } from "react";
-
-interface CartItem extends Product {
-  quantity: number;
-}
+import React from "react";
+import { CartType } from "@/repositories/cart";
 
 interface CartProps {
-  cartItems: [];
+  cart: CartType;
 }
 
-export function Cart({ cartItems }: CartProps) {
-  const [groupedCartItems, setGroupedCartItems] = useState<CartItem[]>([]);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
-
+export function Cart({ cart }: CartProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
         <Button className="relative" variant="outline" size="icon">
           <ShoppingCart />
-          {groupedCartItems.length > 0 && (
+          {cart?.totalItems > 0 && (
             <Badge variant="destructive" className="absolute -top-2 -right-2">
-              {groupedCartItems.length}
+              {cart?.totalItems}
             </Badge>
           )}
         </Button>
@@ -47,8 +40,8 @@ export function Cart({ cartItems }: CartProps) {
         </SheetHeader>
 
         <div className="cart-items">
-          {groupedCartItems.length > 0 ? (
-            groupedCartItems.map((item) => (
+          {cart?.totalItems > 0 ? (
+            cart?.products.map((item) => (
               <div
                 key={item.id}
                 className="cart-item flex justify-between py-2"
@@ -70,7 +63,7 @@ export function Cart({ cartItems }: CartProps) {
         <div className="cart-total mt-4 border-t pt-4">
           <p className="flex justify-between">
             <span>Total Price:</span>
-            <span>${totalPrice.toFixed(2)}</span>
+            <span>${cart?.price?.toFixed(2) ?? 0}</span>
           </p>
         </div>
 
